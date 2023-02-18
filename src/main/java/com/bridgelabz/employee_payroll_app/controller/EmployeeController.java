@@ -1,8 +1,15 @@
 package com.bridgelabz.employee_payroll_app.controller;
 
+import com.bridgelabz.employee_payroll_app.dto.EmployeeDto;
+import com.bridgelabz.employee_payroll_app.exception.ResourceNotFoundException;
 import com.bridgelabz.employee_payroll_app.model.EmployeeModel;
+import com.bridgelabz.employee_payroll_app.response.EmployeeResponse;
 import com.bridgelabz.employee_payroll_app.service.EmployeeService;
+import com.bridgelabz.employee_payroll_app.service.EmployeeServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,27 +21,29 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @PostMapping("/post")
-    public EmployeeModel add(@RequestBody EmployeeModel employeeModel) {
-        return employeeService.addEmployee(employeeModel);
+    public ResponseEntity<EmployeeDto> add(@Valid @RequestBody EmployeeModel employeeModel) {
+        EmployeeDto employeeDto = employeeService.addEmployee(employeeModel);
+        return new ResponseEntity<>(employeeDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get")
-    public List<EmployeeModel> view() {
-        return employeeService.viewEmployees();
+    @GetMapping("/getAll")
+    public ResponseEntity<List<EmployeeDto>> view() {
+        return ResponseEntity.ok(employeeService.viewEmployees());
     }
 
     @GetMapping("/get/{id}")
-    public EmployeeModel viewById(@PathVariable long id) {
-        return employeeService.viewEmployeeById(id);
+    public ResponseEntity<EmployeeDto> viewById(@PathVariable long id) {
+        return ResponseEntity.ok(employeeService.viewEmployeeById(id));
     }
 
     @PutMapping("/put/{id}")
-    public EmployeeModel editById(@PathVariable long id,@RequestBody EmployeeModel employeeModel) {
-        return employeeService.editEmployeeById(id,employeeModel);
+    public ResponseEntity<EmployeeDto> editById(@PathVariable long id, @Valid @RequestBody EmployeeModel employeeModel) {
+        return ResponseEntity.ok(employeeService.editEmployeeById(id, employeeModel));
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteById(@PathVariable long id) {
-         employeeService.deleteEmployeeById(id);
+    public ResponseEntity<?> deleteById(@PathVariable long id) {
+        employeeService.deleteEmployeeById(id);
+        return new ResponseEntity<>(new EmployeeResponse("Employee Deleted Successfully!!!"),HttpStatus.OK);
     }
 }
